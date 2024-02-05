@@ -1,0 +1,35 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Déclenche le workflow à chaque push sur la branche main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Utilise une machine Ubuntu pour l'exécution du workflow
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2  # Action pour récupérer le code du dépôt
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2  # Action pour configurer Node.js
+      with:
+        node-version: '14'  # Version de Node.js à utiliser
+
+    - name: Install dependencies
+      run: npm install  # Installation des dépendances du projet
+
+    - name: Run tests
+      run: npm test  # Exécution des tests
+
+  deploy:
+    needs: build  # Attend que le job "build" soit terminé avec succès
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy to test server
+      run: ssh user@server 'cd /path/to/project && git pull origin main && npm install && npm run build'
+      # Ajoutez ici les commandes ou scripts nécessaires pour déployer votre application sur le serveur de test
+      # Par exemple : ssh user@server 'cd /path/to/project && git pull origin main && npm install && npm run build'
